@@ -116,10 +116,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FileOperations.c" />
     <ClCompile Include="helper.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileOperations.h" />
     <ClInclude Include="helper.h" />
     <ClInclude Include="lib.h" />
   </ItemGroup>

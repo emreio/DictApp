@@ -15,6 +15,10 @@ void changeCharInString(char *pointer)
 	{
 		*(pointer + 4) = 'M';
 	}
+
+
+	//char *buffer[100];
+	//char *buffer[100];
 }
 
 int *createIntPointer()
@@ -51,12 +55,23 @@ void Func1()
 	p1 = createIntPointer();
 	*p1 = 5;
 
+	FILE *myfile = fopen("deneme.txt", "r");
+
+	if (myfile != NULL)
+	{
+		printf("dosya boþ deðil");
+	}
 	int i = 54;
 	printf("pointer address %p\n", p1);
 	printf("value : %d\n", *p1);
 
 	p1 = &i;
 	printf("pointer address : %p\n", p1);
+
+	int myi = 54;
+
+	printf("adres:  %p:", &myi);
+
 	printf("value : %d\n", *p1);
 
 	char *emre = "hello worldssss";
