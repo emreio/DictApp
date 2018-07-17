@@ -27,15 +27,15 @@ FILE* openFileForAppend(char* fileName)
 
 int getLinesCount(FILE* file)
 {
-
 	if (file == NULL) return -1;
 	int lineCount = 0;
 	char *lineS[256];
-
+	char *readLine;
 	while (!feof(file))
 	{
-		fgets(lineS, 256, file);
-		lineCount++;
+		readLine = fgets(lineS, 256, file);
+		if (readLine != NULL)
+			lineCount++;
 	}
 
 	fseek(file, 0, SEEK_SET);

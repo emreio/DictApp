@@ -46,7 +46,7 @@ void externalFunc()
 const char* InitialFileName = "sozluk.txt";
 const char* TurkishDictFileName = "turkce.txt";
 const char* EnglishDictFileName = "ingilize.txt";
-const char* TurkishLocaleName = "Turkish";
+const char* TurkishLocaleName = "turkish";
 
 typedef struct
 {
@@ -57,6 +57,7 @@ typedef struct
 
 int compare(const void *p, const void *p1)
 {
+	setlocale(LC_ALL, TurkishLocaleName);
 	Dictionary v1 = *(Dictionary *)p;
 	Dictionary v2 = *(Dictionary *)p1;
 
@@ -67,29 +68,26 @@ int main()
 {
 	setlocale(LC_ALL, TurkishLocaleName);
 
-	int res = strcmp("emreee", "emreee");
-
-	printf("%d ", res);
-
-	getchar();
-
-	return;
+	char *searchKey;
+	char line[100];
+	int lang = -1;
+	int num_ok;
 
 	int lineCount = 0;
 
-	FILE *file = openFileForRead(InitialFileName);
-	FILE *file1 = createNewFileForWrite(TurkishDictFileName);
-	FILE *file2 = createNewFileForWrite(EnglishDictFileName);
+	FILE *dictionaryFile = openFileForRead(InitialFileName);
+	FILE *turkishFile = createNewFileForWrite(TurkishDictFileName);
+	FILE *englishFile = createNewFileForWrite(EnglishDictFileName);
 
-	if (file == NULL)
+	if (dictionaryFile == NULL)
 	{
 		perror("Error opening file");
 		getchar();
 		exit(-1);
 	}
 
-	lineCount = getLinesCount(file);
-
+	lineCount = getLinesCount(dictionaryFile);
+	printf("sozluk.txt'deki satýr sayýsý: %d \n", lineCount);
 	Dictionary* dictionary = malloc(sizeof(Dictionary) * lineCount);
 
 	int i = 0;
@@ -97,11 +95,20 @@ int main()
 	char *dictionaryLine;
 	char *token1;
 	int tokenLength = 0;
+	char *readline;
+	char *readlineKey[256];
+	char *readlineValue[256];
 
-	while (!feof(file))
+	while (!feof(dictionaryFile))
 	{
-		fgets(buffer, 256, file);
-		dictionaryLine = malloc(strlen(buffer) + 1);
+		readline = fgets(buffer, 256, dictionaryFile);
+
+		if (readline == NULL) continue;
+
+		int _Strlen = strlen(buffer);
+
+		dictionaryLine = malloc(_Strlen + 1);
+
 		strcpy(dictionaryLine, buffer);
 		token1 = strtok(dictionaryLine, " ");
 		tokenLength = strlen(token1);
@@ -131,187 +138,169 @@ int main()
 		i++;
 	}
 
-
-	for (int j = 0; j < lineCount; j++)
-	{
-		printf("%s - %s\n", dictionary[j].key, dictionary[j].value);
-	}
-
-	qsort(dictionary, 3, sizeof(Dictionary), compare);
-
-	printf("after sort \n");
+	qsort(dictionary, lineCount, sizeof(Dictionary), compare);
 
 	for (int j = 0; j < lineCount; j++)
 	{
 		if (j == lineCount - 1)
 		{
-
-			fputs(dictionary[j].key, file1);
-			fputs(dictionary[j].value, file2);
+			fputs(dictionary[j].key, turkishFile);
+			fputs(dictionary[j].value, englishFile);
 		}
 
 		else
 		{
-			fputs(strcat(dictionary[j].key, "\n"), file1);
-			fputs(strcat(dictionary[j].value, "\n"), file2);
+			fputs(strcat(dictionary[j].key, "\n"), turkishFile);
+			fputs(strcat(dictionary[j].value, "\n"), englishFile);
 		}
 	}
 
-	fclose(file1);
-	fclose(file2);
-	fclose(file);
+	printf("Sözlük dosyalarý oluþturuldu. \n");
 
-	printf("sözlükler oluþturuldu. \n");
+	fclose(turkishFile);
+	fclose(englishFile);
+	fclose(dictionaryFile);
 
-
-	char searchString[100];
-
-	scanf("%s", searchString);
-
-
-
-
-	getchar();
-}
-
-
-int main11()
-{
-	int c;
-	int eof;
-	int lines = 0;
-	setlocale(LC_ALL, "Turkish");
-
-	FILE* file = createNewFileForWrite(InitialFileName);
-
-	fputs("\n þemsi paþa pasajý", file);
-
-	fclose(file);
-
-	FILE *	newfile = openFileForAppend(InitialFileName);
-
-	if (newfile == NULL)
+	while (true)
 	{
-		perror("Error opening file");
-	}
+		int keyFileSearchIndex = 0;
+		int valueFileSearchIndex = 0;
 
-	fputs("\n merhaba dünya", newfile);
+		printf("Lütfen arama yapmak istediðiniz dil seçimini yapýnýz. 1: Türkçe || 2: Ýngilizce \n");
 
-	fclose(newfile);
+		fgets(line, sizeof line, stdin);
+		num_ok = sscanf(line, "%d", &lang);
 
-	file = openFileForRead(InitialFileName);
-
-	int linesCount = getLinesCount(file);
-
-	printf("lines count: %d ", lines);
-
-	fseek(file, 0, SEEK_SET);
-
-	if (-1)
-	{
-		printf("true");
-	}
-
-	while (1) {
-		c = fgetc(file);
-		eof = feof(file);
-		if (eof) {
-			break;
-		}
-		printf("%d - %c \n", c, c);
-	}
-
-	char *str[256];
-
-	fseek(file, 0, SEEK_SET);
-
-	while (1)
-	{
-		fgets(str, 256, file);
-		printf("%s \n", str);
-
-		if (feof(file))
-			break;
-	}
-
-
-	fseek(file, 0, SEEK_SET);
-
-	while (!feof(file))
-	{
-		c = fgetc(file);
-		if (c == '\n')
+		if (!num_ok)
 		{
-			lines++;
+			printf("Yanlýþ seçim girdiniz. \n");
+			continue;
 		}
+
+		if (lang == 1)
+		{
+			printf("Türkçe seçtiniz. \n");
+		}
+
+		else if (lang == 2)
+		{
+			printf("Ýngilizce seçtiniz. \n");
+		}
+
+		else
+		{
+			printf("Yanlýþ seçim girdiniz. \n");
+			continue;
+		}
+
+		printf("lütfen aramak istediðiniz kelimeyi giriniz: \n");
+
+		fgets(line, sizeof line, stdin);
+
+		int _len1 = strlen(line);
+
+		searchKey = malloc(_len1);
+
+		strcpy(searchKey, line);
+
+		if (searchKey[_len1 - 1] == '\n')
+			searchKey[_len1 - 1] = '\0';
+
+		printf("girdiðiniz kelime : %s \n", searchKey);
+
+		FILE* _keyFile;
+		FILE* _valueFile;
+
+		if (lang == 1)
+		{
+			_keyFile = openFileForRead(TurkishDictFileName);
+			_valueFile = openFileForRead(EnglishDictFileName);
+		}
+
+		else
+		{
+			_keyFile = openFileForRead(EnglishDictFileName);
+			_valueFile = openFileForRead(TurkishDictFileName);
+		}
+
+
+		if (_keyFile == NULL || _valueFile == NULL)
+		{
+			perror("dosya okunamadý, programdan çýkýlýyor.");
+			break;
+		}
+
+		char *foundKey;
+		char *foundValue;
+		int keyFound = -1;
+
+		while (!feof(_keyFile) && fgets(readlineKey, 256, _keyFile))
+		{
+			keyFound = -1;
+			keyFileSearchIndex++;
+
+			int _len = strlen(readlineKey);
+
+			foundKey = malloc(_len);
+
+			strcpy(foundKey, readlineKey);
+
+			if (foundKey[_len - 1] == '\n')
+				foundKey[_len - 1] = '\0';
+
+			if (strcmp(foundKey, searchKey) == 0)
+			{
+				if (lang == 1)
+				{
+					printf("turkce.txt dosyasýnda aradýðýnýz %s kelimesi %d. kelimedir. \n", searchKey, keyFileSearchIndex);
+				}
+
+				else
+				{
+					printf("ingilizce.txt dosyasýnda aradýðýnýz %s kelimesi %d. kelimedir. \n", searchKey, keyFileSearchIndex);
+				}
+
+				while (!feof(_valueFile) && fgets(readlineValue, 256, _valueFile))
+				{
+					valueFileSearchIndex++;
+
+					if (valueFileSearchIndex == keyFileSearchIndex)
+					{
+						int _len = strlen(readlineValue);
+
+						foundValue = malloc(_len);
+
+						strcpy(foundValue, readlineValue);
+
+						if (foundValue[_len - 1] == '\n')
+							foundValue[_len - 1] = '\0';
+
+						printf("%s kelimesinin karsiligi %s'dir \n", foundKey, foundValue);
+
+						break;
+					}
+				}
+				keyFound = 1;
+				break;
+			}
+		}
+		if (keyFound == -1)
+		{
+			if (lang == 1)
+			{
+				printf("girdiðiniz %s kelimesi turkce.txt'de bulunamadý. \n", searchKey);
+			}
+
+			else
+			{
+				printf("girdiðiniz %s kelimesi ingilizce.txt'de bulunamadý. \n", searchKey);
+			}
+		}
+
+		continue;
 	}
 
-	printf("lines count %d \n", lines);
-	fclose(file);
-
 	getchar();
-}
-
-
-int main1()
-{
-	__int16 testI = 1;
-	printf("%d\n", testI);
-	printf("%p\n", &testI);
-
-	printf("%d\n", sizeof(testI));
-	printf("%d\n", sizeof(__int16));
-
-
-	printf("%p\n", &testI + 1);
-	printf("%p\n", &testI + 2);
-
-	test(testI);
-
-	printf("%d\n", testI);
-	printf("%p\n", &testI);
-
-	getchar();
-	char *path = getenv("HOME");
-	//printf(path);
-
-#ifdef __APPLE__
-	printf("platform : osx \n");
-#else
-	printf("not osx \n");
-	getchar();
-#endif
-	int i = 321;
-	char* p;
-	void(*fun_ptr)();
-
-	p = &i;
-	printf("%d\n", *p);
-
-	printf("Size of int: %d\n", sizeof(int));
-	printf("Size of char: %d\n", sizeof(char));
-	printf("Size of int: %d\n", sizeof(int));
-	printf("Size of long: %d\n", sizeof(long));
-	printf("Size of pointer: %d\n", sizeof(p));
-
-	Func1();
-	fun_ptr = &externalFunc;
-
-	callExternalFunction(fun_ptr);
-	getchar();
-	return 0;
-}
-
-int test(long **testI)
-{
-	int deneme = 5;
-	int *deneme2 = &deneme;
-	*(deneme2 + 2) = 4;
-
-	printf("%d\n", testI);
-	printf("%p\n", &testI);
-	testI = 12;
-
 }
 
 

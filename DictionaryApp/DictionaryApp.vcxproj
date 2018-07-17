@@ -125,6 +125,9 @@
     <ClInclude Include="helper.h" />
     <ClInclude Include="lib.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="sozluk.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
